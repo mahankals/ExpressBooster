@@ -1,0 +1,43 @@
+{
+  "name": "expressbooster",
+  "version": "0.0.1",
+  "description": "Effortless Express: A Rapid Application Server with Seamless Template Integration",
+  "author": "Atul Mahankal <atulmahankal@gmail.com>",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mahankals/ExpressBooster"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "framework",
+    "router",
+    "view",
+    "controller",
+    "model",
+    "web",
+    "app",
+    "rest",
+    "restful",
+    "api",
+    "samples",
+    "quick",
+    "fast",
+    "easy"
+  ],
+  "engines": {
+    "node": ">= 0.10"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express-group-routes": "^1.1.0",
+    "express-list-endpoints": "^6.0.0",
+    "portscanner": "^2.2.0",
+    "require-directory": "^2.1.1"
+  },
+  "devDependencies": {
+    "debug": "^4.3.4"
+  }
+}
