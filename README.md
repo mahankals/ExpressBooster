@@ -27,10 +27,8 @@ viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-li
 </svg> -->
 </center>
 
-<center>
   <img src="resources/icon.svg" alt="App Icon" width="100" height="100">
   <img style="filter: white;" src="resources/title.svg" alt="App Icon" height="100">
-</center>
 
 # Rapid Express Application Framework
 <!--
