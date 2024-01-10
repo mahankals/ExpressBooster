@@ -21,12 +21,15 @@ viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-li
   <rect x="2" y="2" width="20" height="20" rx="2.5" ry="2.5"/>
   <text x="50%" y="50%" font-size="13" text-anchor="middle" dy=".3em" fill="none" stroke-width="2">EB</text>
 </svg> -->
-  <img src="resources/icon.svg" alt="App Icon" width="100" height="100">
 
 <!-- <svg xmlns="http://www.w3.org/2000/svg" width="500" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
   <text x="50%" y="50%" font-size="13" text-anchor="middle" dy=".3em" fill="none" stroke-width="1">ExpressBooster</text>
 </svg> -->
-  <img style="filter: white;" src="resources/title.svg" alt="App Icon" width="500" height="100">
+</center>
+
+<center>
+  <img src="resources/icon.svg" alt="App Icon" width="100" height="100">
+  <img style="filter: white;" src="resources/title.svg" alt="App Icon" height="100">
 </center>
 
 # Rapid Express Application Framework
