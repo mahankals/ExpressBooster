@@ -1,6 +1,17 @@
 const fs = require('fs');
 const path = require('path');
-const { done, removeConsoleLine, confirm, removeDirectoryContents, cloneTemplate, createAppName, readFile, updateKeyValue, writeFile, launchedFromCmd } = require('./custFunc.js');
+const {
+	done,
+	removeConsoleLine,
+	confirm,
+	removeDirectoryContents,
+	cloneTemplate,
+	createAppName,
+	readFile,
+	updateKeyValue,
+	writeFile,
+	launchedFromCmd
+} = require('./custFunc.js');
 const template = require('./teplates.js');
 
 const cliProcess = require('cli-steps');

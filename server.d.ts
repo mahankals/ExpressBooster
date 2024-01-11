@@ -1,23 +1,29 @@
-import { Express } from 'express';
-import { Logger } from 'winston';
+declare module 'expressbooster' {
+  import * as express from 'express';
+  import * as http from 'http';
+  import * as events from 'events';
+  import { Logger } from 'winston';
 
-declare function bootstrap(app: Express): void;
+  type RecursiveJSON = {
+    [key: string]: RecursiveJSON | any[] | Object | string | number | boolean;
+  };
+  
+  class Server extends events.EventEmitter {
+    app: express.Express;
+    server: http.Server;
 
-declare function beforeListen(callback?: () => void): void;
+    constructor();
 
-declare function listen(callback?: () => void): Promise<void>;
+    start(): Promise<void>;
+    use(middleware: express.RequestHandler): void;
+    stop(callback: () => void): void;
+  }
 
-declare function onError(error: any): void;
+  const configs: RecursiveJSON;
 
-declare const logger: Logger;
+  const models: any; // You can replace 'any' with the actual type of your models
 
-// Use 'export =' syntax for default export
-declare const exports: {
-  bootstrap: typeof bootstrap;
-  beforeListen: typeof beforeListen;
-  listen: typeof listen;
-  onError: typeof onError;
-  logger: typeof logger;
-};
+  const logger: Logger;
 
-export = exports;
+  export { Server, configs, models, logger };
+}

@@ -3,12 +3,14 @@
 const EventEmitter = require('events');
 const path = require('path');
 const fs = require('fs');
+const os = require('os')
 const requireDirectory = require('require-directory');
 const express = require('express');
 const endPoints = require('express-list-endpoints');
 const portscanner = require('portscanner');
 const http = require('http');
 const moment = require('moment');
+const chalk = require("cli-color");
 
 //import middlewares
 const bodyParser = require('body-parser');
@@ -40,6 +42,7 @@ class Server extends EventEmitter {
   constructor() {
     super();
     this.app = express();
+    this.server = http.createServer(this.app);
 
     addMiddlewares(this.app);
 
@@ -61,16 +64,14 @@ class Server extends EventEmitter {
   }
   async start() {
     if (await isPortInUse()) {
-      console.error(`Error: Port ${port} is already in use.`);
+      console.error('\x1b[31m%s\x1b[0m', `Error: Port ${port} is already in use.`);
       return;
     }
-    setupRoutes(this.app);
 
-    const server = http.createServer(this.app);
-
-    server.listen(port)
+    this.server.listen(port, '0.0.0.0')
       .on('listening', () => {
-        console.log(`Server started on port ${port}`);
+        // console.log(`Server started on port ${port}`);
+        startMessage(this.server)
         this.emit('started');
       })
       .on('error', (error) => onError(error));
@@ -79,9 +80,15 @@ class Server extends EventEmitter {
   use(middleware) {
     this.app.use(reqMiddleware);
     this.app.use(resMiddleware);
+    setupRoutes(this.app);
     this.app.use(middleware);
     this.app.use(notFoundMiddleware);
     this.app.use(errMiddleware);
+  }
+
+  async stop(callback) {
+    this.server.closeAllConnections();
+    this.server.on('close', callback);
   }
 };
 
@@ -107,7 +114,7 @@ function errMiddleware(err, req, res, next) {
   res.status(statusCode);
   res.write(`${err.message}\n`);
   res.write(`\n`);
-  if(isDev){
+  if (isDev) {
     res.write(err.stack);
   }
   res.end();
@@ -125,7 +132,7 @@ function addMiddlewares(app) {
   configs.express?.paths?.forEach(item => {
     app.use(express.static(item.url, item.options || {}));
   });
-  // app.use(express.static('images', {}));
+
   app.use(compression({
     filter: (req, res) => {
       if (req.headers['x-no-compression']) {
@@ -266,7 +273,7 @@ function handleStartupError(error) {
 }
 
 function importModules(directoryPath) {
-  if (!fs.existsSync(directoryPath)) return;
+  if (!fs.existsSync(directoryPath)) return {};
 
   let m = requireDirectory(
     module,
@@ -276,7 +283,7 @@ function importModules(directoryPath) {
   return m;
 }
 
-const logger = winston.createLogger({
+const Logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({
@@ -302,9 +309,99 @@ const logger = winston.createLogger({
   ),
 });
 
+var logger = {
+  info: console.log,
+  request: function (req, res, error) {
+    var date = utc ? new Date().toUTCString() : new Date();
+    var ip = argv['log-ip']
+      ? req.headers['x-forwarded-for'] || '' + req.connection.remoteAddress
+      : '';
+    if (error) {
+      logger.info(
+        '[%s] %s "%s %s" Error (%s): "%s"',
+        date, ip, chalk.red(req.method), chalk.red(req.url),
+        chalk.red(error.status.toString()), chalk.red(error.message)
+      );
+    }
+    else {
+      logger.info(
+        '[%s] %s "%s %s" "%s"',
+        date, ip, chalk.cyan(req.method), chalk.cyan(req.url),
+        req.headers['user-agent']
+      );
+    }
+  }
+};
+
+function startMessage(server) {
+  var protocol = 'http://';
+  var appPkg = require('./package.json');
+  
+	var addr = server.address();
+	const host = addr.address;  // === '::' ? 'localhost' : addr.address;
+	const port = addr.port;
+
+  logger.info([
+    chalk.yellow(`Starting up ${appPkg.name}-server,`),
+    chalk.cyan(server.root)
+  ].join(''));
+
+  logger.info([chalk.yellow(`\n${appPkg.name}-server version: `), chalk.cyan(appPkg.version)].join(''));
+
+  // logger.info([
+  //   chalk.yellow('\nhttp-server settings: '),
+  //   ([chalk.yellow('CORS: '), argv.cors ? chalk.cyan(argv.cors) : chalk.red('disabled')].join('')),
+  //   ([chalk.yellow('Cache: '), argv.c ? (argv.c === '-1' ? chalk.red('disabled') : chalk.cyan(argv.c + ' seconds')) : chalk.cyan('3600 seconds')].join('')),
+  //   ([chalk.yellow('Connection Timeout: '), argv.t === '0' ? chalk.red('disabled') : (argv.t ? chalk.cyan(argv.t + ' seconds') : chalk.cyan('120 seconds'))].join('')),
+  //   ([chalk.yellow('Directory Listings: '), argv.d ? chalk.red('not visible') : chalk.cyan('visible')].join('')),
+  //   ([chalk.yellow('AutoIndex: '), argv.i ? chalk.red('not visible') : chalk.cyan('visible')].join('')),
+  //   ([chalk.yellow('Serve GZIP Files: '), argv.g || argv.gzip ? chalk.cyan('true') : chalk.red('false')].join('')),
+  //   ([chalk.yellow('Serve Brotli Files: '), argv.b || argv.brotli ? chalk.cyan('true') : chalk.red('false')].join('')),
+  //   ([chalk.yellow('Default File Extension: '), argv.e ? chalk.cyan(argv.e) : (argv.ext ? chalk.cyan(argv.ext) : chalk.red('none'))].join(''))
+  // ].join('\n'));
+
+  logger.info(chalk.yellow('\nAvailable on:'));
+
+  if (host !== '0.0.0.0') {
+    logger.info(`  ${protocol}${host}:${chalk.green(port.toString())}`);
+  } else {
+    var ifaces = os.networkInterfaces();  
+    Object.keys(ifaces).forEach(function (dev) {
+      ifaces[dev].forEach(function (details) {
+        if (details.family === 'IPv4') {
+          logger.info(('  ' + protocol + details.address + ':' + chalk.green(port.toString())));
+        }
+      });
+    });
+  }
+
+  if (typeof proxy === 'string') {
+    if (proxyOptions) {
+      logger.info('Unhandled requests will be served from: ' + proxy + '. Options: ' + JSON.stringify(proxyOptions));
+    }
+    else {
+      logger.info('Unhandled requests will be served from: ' + proxy);
+    }
+  }
+
+  logger.info('Hit CTRL-C to stop the server');
+  // if (argv.o) {
+  //   const openHost = host === '0.0.0.0' ? '127.0.0.1' : host;
+  //   let openUrl = `${protocol}${openHost}:${port}`;
+  //   if (typeof argv.o === 'string') {
+  //     openUrl += argv.o[0] === '/' ? argv.o : '/' + argv.o;
+  //   }
+  //   logger.info('Open: ' + openUrl);
+  //   opener(openUrl);
+  // }
+
+  // Spacing before logs
+  // if (!argv.s) logger.info();
+}
+
 module.exports = {
   Server,
   configs,
   models,
-  logger
+  logger: Logger
 };

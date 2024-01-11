@@ -9,7 +9,6 @@ const template = require('./teplates.js');
 const pkgFile = path.join(__dirname, "../package.json")
 const data = fs.readFileSync(pkgFile, "utf-8");
 const pkg = JSON.parse(data);
-const appPkg = path.join(process.cwd(), 'package.json')
 
 program
 	.name(pkg.name)
@@ -45,5 +44,6 @@ program
 		let matchList = await template.compair(templateChoice, templateList)
 		await template.addTemplates(matchList);
 	});
+
 // Handle the command
 program.parse(process.argv);
