@@ -1,6 +1,6 @@
 {
   "name": "expressbooster",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "icon": "resources/icon.svg",
   "description": "Effortless Express: A Rapid Application Server with Seamless Template Integration",
   "author": "Atul Mahankal <atulmahankal@gmail.com>",

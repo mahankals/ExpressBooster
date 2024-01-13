@@ -118,7 +118,7 @@ async function addTemplates(matchList, showMsg = true) {
     if (showMsg) {
       console.log();
       terminal.info(`    Templates downloaded successfully.`);
-      console.log(`    install dependencies with 'npm install' before start.`);
+      console.log(`    install template dependencies with 'npm install' before start.`);
     };
   } catch (err) {
     console.log(err)
