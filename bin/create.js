@@ -68,11 +68,11 @@ async function createApplication(destinationPath, options) {
 	}).catch((err) => { });
 }
 
-async function gitUpdate(options) {
+async function gitUpdate(destinationPath, options) {
 	try {
 
 		if (options.git || options.repo) {
-			await initGit();
+			await initGit(destinationPath);
 		}
 
 		if (options.repo) {
@@ -83,9 +83,9 @@ async function gitUpdate(options) {
 	}
 }
 
-async function initGit() {
+async function initGit(destinationPath) {
 	console.log(`   \x1b[33mGit\x1b[0m : initializing`)
-	await git.init()
+	await git.init(destinationPath)
 		.add('./*');
 	await git.commit("Project initialised")
 		.then(() => {
@@ -183,6 +183,6 @@ module.exports = async (destinationPath, options) => {
 	updatedContent = updateKeyValue(updatedContent, 'APP_ENV', 'development');
 	await writeFile(path.join('.env'), updatedContent + '\n');
 
-	await gitUpdate(options);
+	await gitUpdate(destinationPath, options);
 	finish(destinationPath);
 }
