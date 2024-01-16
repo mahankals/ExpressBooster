@@ -91,7 +91,6 @@ async function gitUpdate( options) {
 }
 
 async function initGit() {
-	console.log('repoPath:',repoPath)
 	console.log(`   \x1b[33mGit\x1b[0m : initializing`)
 	setGit();
 	await git.init()
