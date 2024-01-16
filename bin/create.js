@@ -23,11 +23,18 @@ const steps = new cliProcess({
 });
 
 const { simpleGit } = require('simple-git');
-const git = simpleGit();
+var repoPath = process.cwd();
+
+function setGit(){
+	git = simpleGit({
+    baseDir: repoPath,
+  });
+}
 
 async function checkRepo(repositoryUrl) {
 	steps.start();
 	steps.text = `Repository Check: `.process + repositoryUrl;
+	setGit();
 	await git.listRemote(['--refs', repositoryUrl]).catch((err) => {// List remote references for the provided repository URL
 		steps.failed(`Repository Check: `.error + repositoryUrl)
 		// terminal.info(`Please provide a valid Git repository URL of the form 'https://github.com/username/repository.git'`)
@@ -68,11 +75,11 @@ async function createApplication(destinationPath, options) {
 	}).catch((err) => { });
 }
 
-async function gitUpdate(destinationPath, options) {
+async function gitUpdate( options) {
 	try {
 
 		if (options.git || options.repo) {
-			await initGit(destinationPath);
+			await initGit();
 		}
 
 		if (options.repo) {
@@ -83,9 +90,11 @@ async function gitUpdate(destinationPath, options) {
 	}
 }
 
-async function initGit(destinationPath) {
+async function initGit() {
+	console.log('repoPath:',repoPath)
 	console.log(`   \x1b[33mGit\x1b[0m : initializing`)
-	await git.init(destinationPath)
+	setGit();
+	await git.init()
 		.add('./*');
 	await git.commit("Project initialised")
 		.then(() => {
@@ -103,7 +112,7 @@ async function initGit(destinationPath) {
 
 async function addRepo(options) {
 	console.log(`   \x1b[33mrepository\x1b[0m : ` + options.repo)
-
+	setGit();
 	// Check if the remote 'origin' exists
 	await git.getRemotes(true, async (err, remotes) => {
 		const originExists = remotes.some(remote => remote.name === 'origin');
@@ -183,6 +192,7 @@ module.exports = async (destinationPath, options) => {
 	updatedContent = updateKeyValue(updatedContent, 'APP_ENV', 'development');
 	await writeFile(path.join('.env'), updatedContent + '\n');
 
-	await gitUpdate(destinationPath, options);
+	repoPath = path.resolve(".");
+	await gitUpdate(options);
 	finish(destinationPath);
 }
