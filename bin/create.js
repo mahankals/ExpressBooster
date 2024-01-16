@@ -4,6 +4,7 @@ const {
 	done,
 	removeConsoleLine,
 	confirm,
+	createDirectory,
 	removeDirectoryContents,
 	cloneTemplate,
 	createAppName,
@@ -38,6 +39,11 @@ async function checkRepo(repositoryUrl) {
 }
 
 async function checkDirectory(destinationPath, force) {
+	if (!fs.existsSync(destinationPath)) await createDirectory(destinationPath);
+	await emptyDirectory(destinationPath, force);
+}
+
+async function emptyDirectory(destinationPath, force) {
 	if (fs.readdirSync(destinationPath).length && !force) {
 		let ans = await confirm('destination is not empty, continue? [y/N] ');
 		if (!ans) {
