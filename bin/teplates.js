@@ -78,35 +78,24 @@ async function addTemplates(matchList, showMsg = true) {
   }
 
   try {
-    // add templates into app.js
-    let appPath = path.join('index.js');
+    // add templates into routes\index.js
+    let appPath = path.join('routes','index.js');
     let data = await readFile(appPath);
-
-    const searchImport = "const app = require('express')()";
-    const searchUse = 'server.use(app)';
+    const searchLine = "module.exports = router";
 
     for (const obj of matchList) {
-      const importStatement = `const ${obj.name}App = require('./apps/${obj.name}/index.js');`;
-      const useStatement = `server.use(${obj.name}App);`;
+      const insertLine = `router.use('/',require('../apps/${obj.name}/index.js'));`;
 
-      // Check if import statement already exists
-      if (!data.includes(importStatement)) {
-        const importPosition = data.indexOf(searchImport) + searchImport.length + 1;
+      // Check if line already exists
+      if (!data.includes(insertLine)) {
+        const importPosition = data.indexOf(searchLine);// + searchLine.length + 1;
 
         // Insert the new import statement
-        data = data.slice(0, importPosition) + `\n${importStatement}` + data.slice(importPosition);
-      }
-
-      // Check if app.use statement already exists
-      if (!data.includes(useStatement)) {
-        const middlewarePosition = data.indexOf(searchUse) + searchUse.length + 1;
-
-        // Insert the new middleware registration
-        data = data.slice(0, middlewarePosition) + `\n${useStatement}` + data.slice(middlewarePosition);
+        data = data.slice(0, importPosition) + `${insertLine}\n` + data.slice(importPosition);
       }
     }
 
-    const hasImportAndUse = data.indexOf(searchImport) >= 0 && data.indexOf(searchUse) >= 0;
+    const hasImportAndUse = data.indexOf(searchLine) >= 0;
 
     // Ensure that the import and middleware registration exist
     if (!hasImportAndUse) {
@@ -114,6 +103,44 @@ async function addTemplates(matchList, showMsg = true) {
     }
 
     await writeFile(appPath, data, false);
+
+
+    // // add templates into app.js
+    // let appPath = path.join('index.js');
+    // let data = await readFile(appPath);
+
+    // const searchImport = "const app = require('express')()";
+    // const searchUse = 'server.use(app)';
+
+    // for (const obj of matchList) {
+    //   const importStatement = `const ${obj.name}App = require('./apps/${obj.name}/index.js');`;
+    //   const useStatement = `server.use(${obj.name}App);`;
+
+    //   // Check if import statement already exists
+    //   if (!data.includes(importStatement)) {
+    //     const importPosition = data.indexOf(searchImport) + searchImport.length + 1;
+
+    //     // Insert the new import statement
+    //     data = data.slice(0, importPosition) + `\n${importStatement}` + data.slice(importPosition);
+    //   }
+
+    //   // Check if app.use statement already exists
+    //   if (!data.includes(useStatement)) {
+    //     const middlewarePosition = data.indexOf(searchUse) + searchUse.length + 1;
+
+    //     // Insert the new middleware registration
+    //     data = data.slice(0, middlewarePosition) + `\n${useStatement}` + data.slice(middlewarePosition);
+    //   }
+    // }
+
+    // const hasImportAndUse = data.indexOf(searchImport) >= 0 && data.indexOf(searchUse) >= 0;
+
+    // // Ensure that the import and middleware registration exist
+    // if (!hasImportAndUse) {
+    //   throw new Error();
+    // }
+
+    // await writeFile(appPath, data, false);
 
     if (showMsg) {
       console.log();

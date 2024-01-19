@@ -5,7 +5,7 @@ const path = require('path');
 const readline = require('readline');
 
 const cliProcess = require('cli-steps');
-const process = new cliProcess({
+const steps = new cliProcess({
   style: 'binary',
   success: '  ',
   fail: 'Fail',
@@ -52,7 +52,7 @@ global.terminal = {
     });
   },
   title: function (...args) {
-    let terminalWidth = global.process.stdout.columns;
+    let terminalWidth = process.stdout.columns;
     console.log()
     // console.log('='.repeat(terminalWidth))
     args.forEach((message, index) => {
@@ -81,7 +81,7 @@ function done(code) {
   // https://github.com/joyent/node/issues/6247 is just one bug example
   // https://github.com/visionmedia/mocha/issues/333 has a good discussion
   function finish() {
-    if (!(draining--)) global.process.exit(code);
+    if (!(draining--)) process.exit(code);
   }
 
   var draining = 0;
@@ -178,8 +178,8 @@ async function removeDirectoryContents(directoryPath) {
 async function cloneTemplate(templates) {
   let { source, destination, title = 'base' } = templates;
 
-  process.start();
-  process.text = `Downloading Template : `.process + title.charAt(0).toUpperCase() + title.slice(1);
+  steps.start();
+  steps.text = `Downloading Template : `.process + title.charAt(0).toUpperCase() + title.slice(1);
   // return console.log(templates, source, destination, title);
   return new Promise(async (resolve, reject) => {
     // console.log(`Downloading Template : `.process + title.charAt(0).toUpperCase() + title.slice(1))
@@ -188,12 +188,12 @@ async function cloneTemplate(templates) {
       .then(async () => {
         // fse.removeSync(`${destination}/.git`);
         fs.rmSync(`${destination}/.git`, { recursive: true, force: true })
-        process.succeed(`Template : `.success + title.charAt(0).toUpperCase() + title.slice(1)) +
+        steps.succeed(`Template : `.success + title.charAt(0).toUpperCase() + title.slice(1)) +
           // console.log(`   Template : `.success + title.charAt(0).toUpperCase() + title.slice(1)) +
           resolve();
       })
       .catch((error) => {
-        process.failed(`Template: `.error + title.charAt(0).toUpperCase() + title.slice(1))
+        steps.failed(`Template: `.error + title.charAt(0).toUpperCase() + title.slice(1))
         // console.log(`   Template: `.error + title.charAt(0).toUpperCase() + title.slice(1))
         terminal.error(error.message);
         reject(error);
