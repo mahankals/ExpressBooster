@@ -4,17 +4,7 @@
   "icon": "resources/icon.svg",
   "description": "Effortless Express: A Rapid Application Server with Seamless Template Integration",
   "author": "Atul Mahankal <atulmahankal@gmail.com>",
-  "main": "server.js",
   "bin": "./bin/command.js",
-  "exports": {
-    ".": {
-      "require": {
-        "types": "./server.d.ts",
-        "default": "./server.js"
-      },
-      "default": "./server.js"
-    }
-  },
   "files": [
     "bin/",
     ".gitignore"
@@ -50,22 +40,8 @@
     "cli-steps": "github:mahankals/cli-steps",
     "colors": "^1.4.0",
     "commander": "^11.1.0",
-    "compression": "^1.7.4",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express-group-routes": "^1.1.0",
-    "express-list-endpoints": "^6.0.0",
-    "helmet": "^7.1.0",
-    "method-override": "^3.0.0",
-    "moment": "^2.30.1",
-    "morgan": "^1.10.0",
-    "portscanner": "^2.2.0",
     "readline": "^1.3.0",
-    "require-directory": "^2.1.1",
-    "serve-favicon": "^2.5.0",
-    "simple-git": "^3.22.0",
-    "winston": "^3.11.0"
+    "simple-git": "^3.22.0"
   },
   "devDependencies": {
     "debug": "^4.3.4"
